@@ -3,11 +3,13 @@ import * as joi from "joi";
 
 interface invConfig {
   APP_PORT: number;
+  DATABASE_URL: string;
 }
 
 const envsSchema = joi
   .object({
     APP_PORT: joi.number().required(),
+    DATABASE_URL: joi.string().required(),
   })
   .unknown(true);
 
@@ -21,4 +23,5 @@ const config: invConfig = value;
 
 export const envs = {
   APP_PORT: config.APP_PORT,
+  DATABASE_URL: config.DATABASE_URL,
 };

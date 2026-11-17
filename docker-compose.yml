@@ -1,13 +1,21 @@
 services:
-  ordes-db:
+  orders-db:
     image: postgres:16.2
     container_name: orders-db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: wilmer
+      POSTGRES_PASSWORD: 123456
       POSTGRES_DB: ordersdb
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - ./orders-db-data:/var/lib/postgresql/data
+      - orders-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ordersdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  orders-db-data:
