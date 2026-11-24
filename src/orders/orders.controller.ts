@@ -1,4 +1,8 @@
-import { Controller, NotImplementedException } from "@nestjs/common";
+import {
+  Controller,
+  NotImplementedException,
+  ParseUUIDPipe,
+} from "@nestjs/common";
 import { MessagePattern, Payload } from "@nestjs/microservices";
 import { OrdersService } from "./orders.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
@@ -18,7 +22,7 @@ export class OrdersController {
   }
 
   @MessagePattern({ cmd: "find_one_order" })
-  findOne(@Payload() id: string) {
+  findOne(@Payload("id", ParseUUIDPipe) id: string) {
     return this.ordersService.findOne(id);
   }
 

@@ -8,6 +8,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { envs } from "../../config/env";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { PrismaClient } from "../generated/prisma/client";
+import { RpcException } from "@nestjs/microservices";
 
 @Injectable()
 export class OrdersService
@@ -45,11 +46,17 @@ export class OrdersService
     return this.order.findMany();
   }
 
-  findOne(id: string) {
-    return this.order.findUnique({
+  async findOne(id: string) {
+    const order = await this.order.findUnique({
       where: {
         id,
       },
     });
+
+    if (!order) {
+      throw new RpcException(`Order with id ${id} not found`);
+    }
+
+    return order;
   }
 }
