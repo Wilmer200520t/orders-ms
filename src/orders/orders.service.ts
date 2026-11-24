@@ -44,6 +44,7 @@ export class OrdersService
   }
 
   async findAll(paginationDto: OrderPaginationDto) {
+    console.log("paginationDto", paginationDto);
     const totalOrders = await this.order.count({
       where: {
         orderStatus: paginationDto.status,

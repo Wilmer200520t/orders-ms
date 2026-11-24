@@ -1,5 +1,6 @@
 import { IsEnum, IsOptional } from "class-validator";
-import { OrderStatus, orderStatusList, PaginationDto } from "../enum";
+import { OrderStatus, orderStatusList } from "../enum";
+import { PaginationDto } from "./pagination.dto";
 
 export class OrderPaginationDto extends PaginationDto {
   @IsOptional()
