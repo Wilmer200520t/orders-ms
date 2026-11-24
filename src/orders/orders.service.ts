@@ -9,6 +9,7 @@ import { envs } from "../../config/env";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { PrismaClient } from "../generated/prisma/client";
 import { RpcException } from "@nestjs/microservices";
+import { OrderPaginationDto } from "./dto";
 
 @Injectable()
 export class OrdersService
@@ -42,8 +43,31 @@ export class OrdersService
     });
   }
 
-  findAll() {
-    return this.order.findMany();
+  async findAll(paginationDto: OrderPaginationDto) {
+    const totalOrders = await this.order.count({
+      where: {
+        orderStatus: paginationDto.status,
+      },
+    });
+
+    const limit = paginationDto.limit || envs.PAGINATION_DEFAULT_LIMIT;
+    const page = paginationDto.page || envs.PAGINATION_DEFAULT_PAGE;
+
+    const orders = await this.order.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where: {
+        orderStatus: paginationDto.status,
+      },
+    });
+
+    return {
+      data: orders,
+      page,
+      limit,
+      totalOrders,
+      LastPage: Math.ceil(totalOrders / limit),
+    };
   }
 
   async findOne(id: string) {
