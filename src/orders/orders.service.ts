@@ -4,14 +4,22 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from "@nestjs/common";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { envs } from "../../config/env";
 import { CreateOrderDto } from "./dto/create-order.dto";
-import { PrismaClient } from "@prisma/client/scripts/default-index.js";
+import { PrismaClient } from "../generated/prisma/client";
 
 @Injectable()
 export class OrdersService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
+  constructor() {
+    super({
+      adapter: new PrismaPg({ connectionString: envs.DATABASE_URL }),
+    });
+  }
+
   async onModuleInit() {
     await this.$connect();
     Logger.log("OrdersService connected to the database", "OrdersService");
@@ -23,22 +31,25 @@ export class OrdersService
   }
 
   create(createOrderDto: CreateOrderDto) {
-    return "This action adds a new order";
+    return this.order.create({
+      data: {
+        totalAmount: createOrderDto.totalAmount,
+        totalItems: createOrderDto.totalItems,
+        orderStatus: createOrderDto.status,
+        paid: Boolean(createOrderDto.paid),
+      },
+    });
   }
 
   findAll() {
-    return [
-      {
-        id: 1,
-        product: "Product 1",
-        quantity: 2,
-        price: 20.0,
-        status: "pending",
-      },
-    ];
+    return this.order.findMany();
   }
 
-  findOne(id: number) {
-    return;
+  findOne(id: string) {
+    return this.order.findUnique({
+      where: {
+        id,
+      },
+    });
   }
 }
